@@ -46,3 +46,30 @@ pub struct Seat {
     pub id: String,
     pub comfort: ComfortClass,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_valid_seat_ref() {
+        let seat = SeatRef::parse("A11").unwrap();
+        assert_eq!(seat.carriage_id, "A");
+        assert_eq!(seat.seat_id, "11");
+    }
+
+    #[test]
+    fn parse_empty_returns_error() {
+        assert!(SeatRef::parse("").is_err());
+    }
+
+    #[test]
+    fn parse_no_carriage_returns_error() {
+        assert!(SeatRef::parse("11").is_err());
+    }
+
+    #[test]
+    fn parse_no_number_returns_error() {
+        assert!(SeatRef::parse("A").is_err());
+    }
+}

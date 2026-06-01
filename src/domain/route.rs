@@ -22,3 +22,23 @@ impl Route {
         o1 < d2 && o2 < d1
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn overlapping_segments() {
+        assert!(Route::legs_overlap(0, 3, 1, 4));
+    }
+
+    #[test]
+    fn sequential_segments_do_not_overlap() {
+        assert!(!Route::legs_overlap(0, 2, 2, 4));
+    }
+
+    #[test]
+    fn non_overlapping_segments() {
+        assert!(!Route::legs_overlap(0, 1, 2, 3));
+    }
+}
