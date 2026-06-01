@@ -6,9 +6,3 @@ pub struct Passenger {
     pub name: String,
     pub tickets: Vec<Ticket>,
 }
-
-impl Passenger {
-    pub fn new(name: &str, tickets: Vec<Ticket>) -> Self {
-        Self { name: name.to_string(), tickets }
-    }
-}

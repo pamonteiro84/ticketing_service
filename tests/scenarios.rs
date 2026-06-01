@@ -3,9 +3,7 @@ use ticketing_service::api::{HttpClient, Router};
 use ticketing_service::infrastructure::{seed, ReservationSystem};
 
 fn make_router() -> Router {
-    let routes = seed::make_routes();
-    let services = seed::make_services(&routes);
-    Router::new(ReservationSystem::new(services))
+    Router::new(ReservationSystem::new(seed::make_services()))
 }
 
 #[test]

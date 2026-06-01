@@ -18,6 +18,9 @@ impl Route {
         self.stops.iter().position(|s| s.station.name == station_name)
     }
 
+    /// Returns true when two legs share at least one segment.
+    /// A leg is the half-open interval `[origin, destination)`, so adjacent legs
+    /// (where one ends exactly where the other begins) do **not** overlap.
     pub fn legs_overlap(o1: usize, d1: usize, o2: usize, d2: usize) -> bool {
         o1 < d2 && o2 < d1
     }

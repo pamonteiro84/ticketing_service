@@ -26,6 +26,8 @@ impl ReservationSystem {
         self.bookings.get(&id).ok_or(AppError::BookingNotFound(id))
     }
 
+    /// Validates all tickets before persisting. Either the entire booking is created or
+    /// nothing is written — partial state is never stored.
     pub fn create_booking(&mut self, passengers: Vec<Passenger>) -> Result<&Booking> {
         for passenger in &passengers {
             for ticket in &passenger.tickets {
@@ -34,18 +36,12 @@ impl ReservationSystem {
         }
         let booking = Booking::new(passengers);
         let id = booking.id;
-        self.bookings.insert(id, booking);
-        Ok(self.bookings.get(&id).unwrap())
+        Ok(self.bookings.entry(id).or_insert(booking))
     }
 
-    pub fn services(&self) -> impl Iterator<Item = &Service> {
-        self.services.values()
-    }
-
-    pub fn bookings(&self) -> impl Iterator<Item = &Booking> {
-        self.bookings.values()
-    }
-
+    /// Checks seat existence and detects leg overlap against every existing booking
+    /// for the same seat on the same service. A conflict exists when the requested
+    /// leg overlaps any already-reserved leg: `o1 < d2 && o2 < d1`.
     fn validate_ticket(&self, ticket: &Ticket) -> Result<()> {
         let service = self.get_service(&ticket.service_id)?;
         let route = &service.route;
@@ -96,8 +92,8 @@ impl ReservationSystem {
                     if existing.seat_ref != ticket.seat_ref {
                         continue;
                     }
-                    let eo = route.stop_index(&existing.origin).unwrap_or(0);
-                    let ed = route.stop_index(&existing.destination).unwrap_or(0);
+                    let Some(eo) = route.stop_index(&existing.origin) else { continue; };
+                    let Some(ed) = route.stop_index(&existing.destination) else { continue; };
                     if crate::domain::Route::legs_overlap(origin_idx, dest_idx, eo, ed) {
                         return Err(AppError::SeatAlreadyTaken {
                             service_id: ticket.service_id.clone(),
