@@ -1,9 +1,5 @@
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug)]
-pub enum AppError {
-    InvalidSeatRef(String),
-}
+use crate::error::AppError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ComfortClass {
